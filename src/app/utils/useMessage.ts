@@ -1,6 +1,7 @@
 export async function fetchMessage() {
   try { 
-    const response = await fetch("/api/messages", {
+    const baseURL = process.env.NODE_ENV === 'development' ? '': process.env.NEXT_PUBLIC_BASE_URL
+    const response = await fetch(`${baseURL}/api/messages`, {
       cache: 'no-store'
     });
     const data = await response.json();
