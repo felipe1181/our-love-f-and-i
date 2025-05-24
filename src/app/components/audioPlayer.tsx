@@ -6,23 +6,63 @@ export default function AudioPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simula um clique no botão após um pequeno delay
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    // Verifica se o arquivo de áudio está carregado corretamente
+    const handleError = (e: Event) => {
+      console.error("Erro ao carregar áudio:", e);
+      setError("Não foi possível carregar o áudio");
+    };
+
+    const handleCanPlay = () => {
+      setError(null);
+      // Tenta tocar quando o áudio estiver pronto
+      audio
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch((err) => {
+          console.error("Erro ao tocar áudio:", err);
+          setError("Não foi possível tocar o áudio automaticamente");
+        });
+    };
+
+    audio.addEventListener("error", handleError);
+    audio.addEventListener("canplaythrough", handleCanPlay);
+
+    // Tenta tocar após um delay
     const timeoutId = setTimeout(() => {
-      if (buttonRef.current) {
-        audioRef.current?.play().then(() => setIsPlaying(true));
+      if (audio.paused) {
+        audio
+          .play()
+          .then(() => setIsPlaying(true))
+          .catch((err) => {
+            console.error("Erro ao tocar áudio:", err);
+            setError("Não foi possível tocar o áudio automaticamente");
+          });
       }
     }, 1001);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      audio.removeEventListener("error", handleError);
+      audio.removeEventListener("canplaythrough", handleCanPlay);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const handleClick = () => {
     if (audioRef.current) {
       if (audioRef.current.paused) {
-        audioRef.current.play();
-        setIsPlaying(true);
+        audioRef.current
+          .play()
+          .then(() => setIsPlaying(true))
+          .catch((err) => {
+            console.error("Erro ao tocar áudio:", err);
+            setError("Não foi possível tocar o áudio");
+          });
       } else {
         audioRef.current.pause();
         setIsPlaying(false);
@@ -34,16 +74,16 @@ export default function AudioPlayer() {
     <div className="fixed bottom-4 right-4 z-50">
       <audio
         ref={audioRef}
-        src="/musica.mp3"
+        src="/nossa-musica.mp3"
         loop
         preload="auto"
-        autoPlay
         className="hidden"
       />
       <button
         ref={buttonRef}
         onClick={handleClick}
         className="bg-pink-500 hover:bg-pink-600 text-white rounded-full p-3 shadow-lg transition-all duration-300"
+        title={error || (isPlaying ? "Pausar música" : "Tocar música")}
       >
         {isPlaying ? (
           <svg
