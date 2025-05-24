@@ -2,6 +2,7 @@
 
 import { fetchMessage } from "@/app/utils/useMessage";
 import Countdown from "@/app/components/countdown";
+import AudioPlayer from "@/app/components/audioPlayer";
 
 export interface MessageResponse {
   message: string;
@@ -29,6 +30,9 @@ export default async function Home() {
 
         <div>
           <Countdown />
+        </div>
+        <div>
+          <AudioPlayer />
         </div>
       </div>
     </main>
