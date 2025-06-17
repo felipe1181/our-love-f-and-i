@@ -1,6 +1,6 @@
 export async function fetchMessage() {
   try { 
-    const baseURL = process.env.NODE_ENV === 'development' ? '': process.env.NEXT_PUBLIC_BASE_URL
+    const baseURL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000': process.env.NEXT_PUBLIC_BASE_URL
     const response = await fetch(`${baseURL}/api/messages`, {
       cache: 'no-store'
     });

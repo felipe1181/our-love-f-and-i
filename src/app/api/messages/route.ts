@@ -25,18 +25,17 @@ const loveMessages = [
 
 export async function GET() { 
     const today = new Date();
-    const endDate = new Date(process.env.NEXT_PUBLIC_MEETING_DATE || '2025-06-06');
+    const endDate = new Date(process.env.NEXT_PUBLIC_MEETING_DATE || new Date());
     
     // Calcula a diferença em dias entre hoje e a data do encontro
-    const daysUntilMeeting = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const timeDiff = endDate.getTime() - today.getTime();
+    const daysUntilMeeting = Math.max(0, Math.ceil(timeDiff / (1000 * 60 * 60 * 24)));
     
     // Usa o número de dias restantes para determinar o índice da mensagem
-    // Isso garante que a mensagem mude a cada dia
-    const messageIndex = Math.abs(daysUntilMeeting) % loveMessages.length;
+    const messageIndex = daysUntilMeeting % loveMessages.length;
 
-    
-  return NextResponse.json({
-    message: loveMessages[messageIndex],
-    daysUntilMeeting: Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)),
-  });
+    return NextResponse.json({
+      message: loveMessages[messageIndex],
+      daysUntilMeeting: daysUntilMeeting,
+    });
 } 
